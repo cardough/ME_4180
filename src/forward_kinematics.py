@@ -27,7 +27,7 @@ def total_transform(D_H_table):
     return simplify(T_tot)
         
 
-
+"""
 l_1, l_2, l_3, θ_1, θ_2, θ_3 = symbols('l_1, l_2, l_3, θ_1, θ_2, θ_3')
 
 # total table including gripper frame
@@ -58,7 +58,7 @@ pprint(T_total_H)
 print("Symbolic frame 3 tranform matrix:")
 pprint(T_total_3)
 
-""" Case 1 """
+
 
 print('Case 1 total transform matrix (0_H_T): ')
 pprint(T_total_H.subs({θ_1:0, θ_2:0, θ_3:0}).evalf())
@@ -66,7 +66,7 @@ pprint(T_total_H.subs({θ_1:0, θ_2:0, θ_3:0}).evalf())
 print('Case 1 frame 3 transform matrix (0_3_T): ')
 pprint(T_total_3.subs({θ_1:0, θ_2:0, θ_3:0}).evalf())
 
-""" Case 2 """
+
 print('')
 print('Case 2 total transform matrix (0_H_T): ')
 pprint(T_total_H.subs({θ_1:10 * pi/180, θ_2:20 * pi/180, θ_3:30 * pi/180}).evalf())
@@ -75,7 +75,7 @@ print('Case 2 frame 3 transform matrix (0_3_T): ')
 pprint(T_total_3.subs({θ_1:10 * pi/180, θ_2:20 * pi/180, θ_3:30 * pi/180}).evalf())
 
 
-""" Case 3 """
+
 print('')
 print('Case 3 total transform matrix (0_H_T): ')
 pprint(T_total_H.subs({θ_1:90 * pi/180, θ_2:90 * pi/180, θ_3:90 * pi/180}).evalf())
@@ -83,3 +83,4 @@ pprint(T_total_H.subs({θ_1:90 * pi/180, θ_2:90 * pi/180, θ_3:90 * pi/180}).ev
 print('Case 3 frame 3 transform matrix (0_3_T): ')
 pprint(T_total_3.subs({θ_1:90 * pi/180, θ_2:90 * pi/180, θ_3:90 * pi/180}).evalf())
 
+"""
