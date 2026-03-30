@@ -8,14 +8,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "robotics_cd"
 version = "0.1.0"
-requires-python = ">=3.14"
+requires-python = ">=3.10,<3.12"
 
 dependencies = [
-    "PySide6~=6.11", # GUI framework
-    "roboticstoolbox-python", # Peter Corke (the GOAT) tools for python
-    "sympy", # symbolic stuff for maths etc.
+    "numpy==1.25.2",
+    "scipy>=1.10,<1.12",
+    "matplotlib>=3.7,<3.9",
+    "PySide6>=6.5,<6.8",
+    "spatialmath-python>=1.1.8,<1.2",
+    "roboticstoolbox-python>=1.1.0,<1.2",
+    "sympy"
 ]
-
 
 [project.optional-dependencies]
 
