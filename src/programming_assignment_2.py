@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("QtAgg")
 import matplotlib.pyplot as plt
-plt.show = lambda *args, **kwargs: None
+plt.show = lambda *args, **kwargs: None     # prevents pyplot another window from appearing
 
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
@@ -22,11 +22,10 @@ class RobotCanvas(FigureCanvas):
     def __init__(self, parent=None):
         self.backend = PyPlot()
         self.backend.launch()
-        self.backend.fig.canvas.manager.window.hide()
-
         self.fig = self.backend.fig
         super().__init__(self.fig)
 
+        # DH table; robot is currently hardcoded with arbitrary link lengths
         L1 = rtb.RevoluteMDH(alpha=0,      a=0,     d=0)
         L2 = rtb.RevoluteMDH(alpha=pi/2,   a=.4,     d=0)
         L3 = rtb.RevoluteMDH(alpha=0,      a=.3,     d=0)
@@ -38,10 +37,7 @@ class RobotCanvas(FigureCanvas):
         self.q = [0, 0, 0, 0]
         self.backend.step()
 
-        # Axes reference
         self.ax = self.backend.ax
-
-        # Initial placeholder for custom elements
         self.trajectory = None
         self.update_trajectory(10)
 
@@ -50,14 +46,14 @@ class RobotCanvas(FigureCanvas):
         if self.trajectory is not None:
             self.trajectory.remove()
 
-        x, y, z = [0 for i in range(number_steps)], [0 for i in range(number_steps)], [0 for i in range(number_steps)]
+        # linearly interpolate to find range of joint angles
         angle_ranges = []
         for angle in self.q:
             angle_ranges.append(np.linspace(0, angle, number_steps))
-
         angle_ranges = np.array(angle_ranges).T
-        print(angle_ranges)
 
+        # use forward kinematics to find trajectory shape
+        x, y, z = [0 for i in range(number_steps)], [0 for i in range(number_steps)], [0 for i in range(number_steps)]
         for i, q in enumerate(angle_ranges):
             pos = self.robot.fkine(q).t
             x[i] = pos[0]
@@ -65,15 +61,13 @@ class RobotCanvas(FigureCanvas):
             z[i] = pos[2]
 
         self.trajectory, = self.ax.plot(x, y, z, 'b-')
-
-        # Trigger canvas redraw
         self.fig.canvas.draw_idle()
 
     def update_joints(self, value_rad, number_steps):
         self.q = value_rad
         self.robot.q = self.q
 
-        # Step robot (clears axes and redraws robot)
+        # re-draw robot
         self.backend.step()
 
         # Re-plot custom elements AFTER step
@@ -129,12 +123,11 @@ class ControlPanel(QWidget):
         self.button = QPushButton("Update")
         layout.addWidget(self.button)
 
-        # Sync slider → textbox (live, but no render yet)
         self.joint_one_slider.valueChanged.connect(self.sync_one)
         self.joint_two_slider.valueChanged.connect(self.sync_two)
         self.joint_three_slider.valueChanged.connect(self.sync_three)
 
-        # Button triggers actual render
+        # make the update button re-render the canvas
         self.button.clicked.connect(self.apply_update)
 
     def sync_one(self, value):
