@@ -1,6 +1,6 @@
-from sympy import symbols, Matrix, zeros, expand, simplify, pprint, pi, diff
-from sympy.physics.mechanics import dynamicsymbols, init_vprinting
-from sympy.physics.vector import vpprint, vprint
+from sympy import symbols, Matrix, zeros, expand, simplify, pi, diff
+from sympy.physics.mechanics import dynamicsymbols
+from sympy.physics.vector import vprint
 import forward_kinematics
 
 ## velocity propagation code
