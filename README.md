@@ -31,7 +31,7 @@ Assignments and projects relating to ME 4180 - Mechanical Considerations in Robo
 6. You should now be able run scripts from the project either using your IDE's run button or by running the script in the terminal. Try:
 
     ```bash
-    .ven/Scripts/python.exe src/programming_assignment_2.py
+    .venv/Scripts/python.exe src/programming_assignment_2.py
     ```
 
     to test if the environment was set up correctly.
