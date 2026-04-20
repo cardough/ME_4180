@@ -72,7 +72,7 @@ def inward_forces(
 
 
 
-def iterative_newton_euler(D_H_table, link_masses, I_matrices):
+def iterative_newton_euler(D_H_table, link_masses, I_matrices, juv):
 
     omegas = [Matrix([0, 0, 0])]
     omega_dots = [Matrix([0, 0, 0])]
@@ -203,7 +203,7 @@ def lagrangian(D_H_table, link_masses, link_Is, P_centroids, joint_variables):
     return tau.simplify()
 
 # attempt at cartesian conversian of the dynamics
-def cartesian_conversion(tau, dh_table, joint_params):
+def cartesian_conversion(tau, dh_table:Matrix, joint_params:Matrix):
     J = jacobian_calcs.velocity_jacobian(dh_table, joint_params)
     theta = joint_params
     theta_dot = joint_params.diff(t)

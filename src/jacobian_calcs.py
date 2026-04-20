@@ -34,7 +34,7 @@ def total_velocity(D_H_table):
 
     return simplify(omega), simplify(v)
 
-def velocity_jacobian(dh_table, joint_params):
+def velocity_jacobian(dh_table, joint_params) -> Matrix:
 
     joint_velocities = diff(joint_params)
     

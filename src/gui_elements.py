@@ -26,7 +26,7 @@ class RobotCanvas(FigureCanvas):
         self.backend.launch()
         self.fig = self.backend.fig
         super().__init__(self.fig)
-
+        
         # create rtb robot from given dh table with self.q for joint controls
         self.dh_table = dh_table
         self.n_links = len(dh_table)
@@ -38,7 +38,7 @@ class RobotCanvas(FigureCanvas):
 
         self.robot = rtb.DHRobot(bot_desc, name="robot")
         self.backend.add(self.robot)
-
+        
         # step backend and pull out axes to use for plotting custom stuff
         self.backend.step()
         self.ax = self.backend.ax
@@ -50,7 +50,6 @@ class RobotCanvas(FigureCanvas):
         # Remove old trajectory line if it exists
         if self.trajectory is not None:
             self.trajectory.remove()
-
         # linearly interpolate to find range of joint angles
         angle_ranges = []
         for angle in self.q:
@@ -95,7 +94,7 @@ class JointSlider(QFrame):
         """)
         
         main_layout = QVBoxLayout(self)
-        self.joint_id = joint_index
+        self.joint_id = joint_index 
 
         #create and add text box w/ label
         text_entry_layout = QFormLayout()
