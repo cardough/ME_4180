@@ -1,10 +1,13 @@
-from sympy import symbols, simplify, Eq, solve
+from sympy import symbols, simplify, Eq, solve, expand
+from sympy.core.expr import Expr
 from sympy.physics.mechanics import dynamicsymbols
 t = dynamicsymbols._t
 from sympy.utilities.lambdify import lambdify
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from typing import cast
 
 import roboticstoolbox as rtb
 
@@ -34,8 +37,8 @@ def two_cubics_with_via(θ_o, θ_dot_o, θ_v, θ_f, θ_dot_f, t_v, t_f):
     
     # generate two cubics with an unknown velocity at the via point
     θ_dot_v = symbols("θ_dot_v")
-    first_cubic = third_order_polynomial(θ_o, θ_dot_o, θ_v, θ_dot_v, t_v)
-    second_cubic = third_order_polynomial(θ_v, θ_dot_v, θ_f, θ_dot_f, t_f-t_v)
+    first_cubic: Expr = third_order_polynomial(θ_o, θ_dot_o, θ_v, θ_dot_v, t_v)
+    second_cubic: Expr = third_order_polynomial(θ_v, θ_dot_v, θ_f, θ_dot_f, t_f-t_v)
 
     # find acceleration at via point for both cubics
     accel_1 = first_cubic.diff(t, 2).subs(t, t_v)
@@ -72,7 +75,9 @@ if __name__ == "__main__":
         'ytick.labelsize': 6,   # Y-tick size
         'legend.fontsize': 8    # Legend size
         })
-    fig, ax = plt.subplots(n_derivatives + 1, 1, figsize=(8, 10))
+    
+    fig, axes = plt.subplots(n_derivatives + 1, 1, figsize=(8, 10))
+    ax: list[Axes] = [cast(Axes, ax) for ax in np.ndarray.flatten(axes)]
     ax[0].set_title("Various Trajectories with Time Derivatives")
     ax[0].set_ylabel("Position (degrees)")
     ax[1].set_ylabel("Velocity (degrees/s)")
@@ -96,7 +101,7 @@ if __name__ == "__main__":
                 vals = np.full_like(t_series, vals)
             ax[k].plot(t_series, vals, label=name)
             
-            print(f"    {derivs[k]} = {simplify(path)}")
+            print(f"    {derivs[k]} = {expand(path)}")
             
             path = path.diff(t)
     
@@ -105,7 +110,7 @@ if __name__ == "__main__":
     vals = [traj.q, traj.qd, traj.qdd, np.gradient(traj.qdd, t_series, axis=0)]
     for k in range(n_derivatives + 1):
         ax[k].plot(t_series, vals[k], lw=4, zorder=-10,
-                   color='g', alpha=0.2, label='Corke rtb jtraj')
+                   color='g', alpha=0.2, label='D. Corke rtb jtraj')
     ax[0].legend(loc='upper right')    
     
     
@@ -121,7 +126,8 @@ if __name__ == "__main__":
     t_f = 2             # s
     
     # Plot trajectory (C.)
-    fig2, ax2 = plt.subplots(n_derivatives + 1, 1, figsize=(8, 10))
+    fig2, axes = plt.subplots(n_derivatives + 1, 1, figsize=(8, 10))
+    ax2: list[Axes] = [cast(Axes, ax2) for ax2 in np.ndarray.flatten(axes)]
     ax2[0].set_title("Two Cubic Trajectories with Time Derivatives")
     ax2[0].set_ylabel("Position (degrees)")
     ax2[1].set_ylabel("Velocity (degrees/s)")
@@ -141,7 +147,7 @@ if __name__ == "__main__":
             if isinstance(vals, (float, np.floating)):
                 vals = np.full_like(t_series, vals)
             values.append(vals)
-            print(f'    {derivs[k]}, cubic #{i+1} = {simplify(path)}')
+            print(f'    {derivs[k]}, cubic #{i+1} = {expand(path)}')
             paths[i] = path.diff(t)
         vals1 = values[0][0:-1]
         values = np.concatenate((vals1, values[1]))
