@@ -218,6 +218,7 @@ def cartesian_conversion(tau, dh_table:Matrix, joint_params:Matrix):
     #print(sol)
 
 
+# ^^^ what we say to dogs ^^^
 
 if __name__ == "__main__":
 
