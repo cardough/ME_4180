@@ -1,4 +1,6 @@
-from sympy import symbols, Matrix, zeros, eye, expand, simplify, pi, linsolve
+from sympy import (symbols, Matrix, zeros, eye,
+                   diff, simplify, pi, Expr, expand,
+                   pretty_print)
 from sympy.physics.mechanics import dynamicsymbols
 t = dynamicsymbols._t
 from sympy.physics.vector import vprint
@@ -72,7 +74,7 @@ def inward_forces(
 
 
 
-def iterative_newton_euler(D_H_table, link_masses, I_matrices, juv):
+def iterative_newton_euler(D_H_table, link_masses, I_matrices):
 
     omegas = [Matrix([0, 0, 0])]
     omega_dots = [Matrix([0, 0, 0])]
@@ -202,20 +204,59 @@ def lagrangian(D_H_table, link_masses, link_Is, P_centroids, joint_variables):
 
     return tau.simplify()
 
-# attempt at cartesian conversian of the dynamics
-def cartesian_conversion(tau, dh_table:Matrix, joint_params:Matrix):
-    J = jacobian_calcs.velocity_jacobian(dh_table, joint_params)
+def format_dynamic_eq(tau:Matrix, joint_params:Matrix):
+    # Splits the joint force vector into inertia, coriolis/centrifugal, and gravity terms.
+    # Returns them in a tuple; they must be "reconstituted" with (M*qdd + C + G) if
+    # you want to use them as a dynamic equation
+    
     theta = joint_params
     theta_dot = joint_params.diff(t)
     theta_double_dot = joint_params.diff(t, 2)
+    
+    n_joints = len(joint_params)
+    
+    grav_terms: Matrix = tau
+    for i in range(n_joints):
+        grav_terms = grav_terms.subs({theta_dot[i]: 0, theta_double_dot[i]: 0})
+    G: Matrix = grav_terms
+    
+    M = Matrix((tau - G).diff(theta_double_dot).reshape(2,2))
+    
+    V = simplify(tau - M*theta_double_dot - G)
+    
+    # this part is witchcraft to factor out a velocity
+    C = zeros(n_joints, n_joints)
+    for k in range(n_joints):       # like why are there 3 loops? (holy O(n^2))
+        for j in range(n_joints):
+            for i in range(n_joints):
+                # Calculate Christoffel symbol
+                c_ijk = 0.5 * (diff(M[k, j], theta[i]) +
+                            diff(M[k, i], theta[j]) - 
+                            diff(M[i, j], theta[k]))
+                C[k, j] += c_ijk * theta_dot[i]
+
+    return M, V, G
+
+
+
+# attempt at cartesian conversion of the dynamics
+def cartesian_conversion(tau, dh_table:Matrix, joint_params:Matrix):
+    theta_dot = joint_params.diff(t)
+    x, y, z = dynamicsymbols("x, y, z")
+    end_eff_pos = Matrix([x, y, z])
+    end_eff_accel = end_eff_pos.diff(t, 2)
+    J = jacobian_calcs.velocity_jacobian(dh_table, joint_params)
+    J_dot = J.diff(t)
     J_inv = J.pinv()
     J_inv_T = J.T.pinv()
-
-    vprint(J_inv_T * tau)
-
     
-    #sol = linsolve((J.T, tau), (joint_params[0], joint_params[1]))
-    #print(sol)
+    M, V, G = format_dynamic_eq(tau, joint_params)
+    
+    M_x = J_inv_T*M*J_inv
+    V_x = J_inv_T*M*J_inv*J_dot*theta_dot + J_inv_T*V
+    G_x = J_inv_T*G
+    
+    return simplify(M_x*end_eff_accel + V_x + G_x)
 
 
 # ^^^ what we say to dogs ^^^
@@ -262,6 +303,7 @@ if __name__ == "__main__":
 
     # 3. Convert dynamics equations to cartesian space
     print("Dynamic equation converted into cartesian forces in frame {2}:")
-    print(cartesian_conversion(lagrangian_torques, d_h_table_H, joint_vars))
+    cart = cartesian_conversion(lagrangian_torques, d_h_table_H, joint_vars)
+    pretty_print(cart[0])
     print("")
 
