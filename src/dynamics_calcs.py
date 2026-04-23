@@ -259,7 +259,6 @@ def cartesian_conversion(tau, dh_table:Matrix, joint_params:Matrix):
     return simplify(M_x*end_eff_accel + V_x + G_x)
 
 
-# ^^^ what we say to dogs ^^^
 
 if __name__ == "__main__":
 
