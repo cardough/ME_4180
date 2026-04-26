@@ -18,7 +18,8 @@ dependencies = [
     "spatialmath-python>=1.1.8,<1.2",
     "roboticstoolbox-python>=1.1.0,<1.2",
     "websockets>=10.0,<14.0",
-    "sympy"
+    "bdsim==1.1.2",
+    "sympy",
 ]
 
 [project.optional-dependencies]
