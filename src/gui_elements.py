@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("QtAgg")
 import matplotlib.pyplot as plt
-plt.show = lambda *args, **kwargs: None     # prevents pyplot another window from appearing
+plt.show = lambda *args, **kwargs: None     # prevents another pyplot window from appearing
 
 from PySide6.QtCore import (Qt, QSignalBlocker)
 from PySide6.QtGui import QDoubleValidator
