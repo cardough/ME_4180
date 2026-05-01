@@ -3,7 +3,7 @@
 
 Assignments and projects relating to ME 4180 - Mechanical Considerations in Robotics
 
-## Installation Instructions
+## Getting Started
 
 1. Ensure Git (<https://git-scm.com/install/>) and Python 3.10 (<https://www.python.org/downloads/>) are installed on the system. Also install Graphviz if you want to see block diagram visualizations: <https://graphviz.org/download/>. Make sure their commands are added to the global Windows "Path" variable, or the Mac/Linux equivalent.
 2. Next, find a free folder to place the code in; ideally one that is not automatically backed up with Onedrive or similar.
@@ -35,3 +35,11 @@ Assignments and projects relating to ME 4180 - Mechanical Considerations in Robo
     ```
 
     to test if the environment was set up correctly.
+
+## Packaging for Distribution
+
+The full code of any file in this project, along with a copy of the python interpreter and all required dependencies, can be packaged into a single program for sharing.
+
+```bash
+pyinstaller src/programming_assignment_2.py --onefile --noupx --noconsole
+```
