@@ -2,6 +2,8 @@ import bdsim
 from bdsim import BDSim
 from bdsim.blockdiagram import BlockDiagram
 
+import matplotlib.pyplot as plt
+
 sim: BDSim = bdsim.BDSim()
 bd: BlockDiagram = sim.blockdiagram()
 
@@ -20,9 +22,8 @@ g = 0 # ignore gravity at first
 K_e = 1 # encode transfer function
 
 # add in load inertia and damping
-scale = 1.0
-J = J_m + (J_L*scale)/(n**2)
-C = C_m + (C_L*scale)/(n**2)
+J = J_m + J_L/(n**2)
+C = C_m + C_L/(n**2)
 
 # Open-loop electromechanical system
 amp = bd.GAIN(K_a, name='Amp')
@@ -41,31 +42,21 @@ gear_ratio[0] = jc_motor_dynamics
 integrator[0] = gear_ratio
 
 # Closed-loop feedback control
-
-# build commanded input
-on_ramp = bd.RAMP(T=0.0, slope=60/1.5, name='on_ramp') 
-off_ramp = bd.RAMP(T=1.5, slope=60/1.5, name='off_ramp')
-commanded_theta_L = bd.GAIN(1.0, name='commanded_theta_L')
-commanded_theta_L[0] = on_ramp - off_ramp
-
-encoder = bd.GAIN(K_e, name='Encoder')      # sensor
-encoder[0] = integrator
-
-# custom PD controller
-P_gain = 2.0
-D_gain = 0.6
-amp[0] = (P_gain*(commanded_theta_L - encoder) - D_gain * gear_ratio)
-
-# scopes for visualization plots
+pid = bd.LTI_SISO([1.0], [1, 0], name='PID Controller')
+commanded_theta_L = bd.STEP(T=0.0, on=60.0, off=0.0, name='Commanded Theta_L') # commanded input
+encoder = bd.GAIN(K_e, name='Encoder')
 scope = bd.SCOPE(styles=['k', 'r--'], name='Angle and Angular Velocity')
 v_scope = bd.SCOPE(styles=['k', 'r--'], name='Control Effort and Back emf')
+
+pid[0] = commanded_theta_L - encoder
+amp[0] = pid
+encoder[0] = integrator
 scope[0] = integrator # angle
 scope[1] = gear_ratio # angular velocity
 v_scope[0] = amp # control effort voltage
 v_scope[1] = back_emf # back emf
 
-
 # Compile and Run
 bd.compile()
-results = sim.run(bd, T=3)
-
+results = sim.run(bd, T=1.5)
+sim.showgraph(bd)
