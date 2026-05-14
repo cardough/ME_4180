@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 
 from math import pi
 
-from gui_elements import RobotCanvas, ControlPanel
+from gui_elements import RobotCanvas, AssignmentTwoControlPanel
 
 class AssingmentTwoWindow(QMainWindow):
     def __init__(self, dh_table=None):
@@ -17,7 +17,7 @@ class AssingmentTwoWindow(QMainWindow):
         layout = QHBoxLayout(central)
 
         self.canvas = RobotCanvas(self, dh_table=dh_table)
-        self.controls = ControlPanel(self.canvas)
+        self.controls = AssignmentTwoControlPanel(self.canvas)
 
         layout.addWidget(self.controls, 1)
         layout.addWidget(self.canvas, 4)

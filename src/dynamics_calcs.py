@@ -142,7 +142,7 @@ def k_total(D_H_table, link_masses, link_Is, P_centroids):
     omega = Matrix([0, 0, 0])
     v = Matrix([0, 0, 0])
 
-    k_total = 0.0
+    k_total: Matrix = 0.0
 
     # step forward through each link and add up k
     for i in range(D_H_table.shape[0]):
@@ -224,7 +224,7 @@ def format_dynamic_eq(tau:Matrix, joint_params:Matrix):
     
     V = simplify(tau - M*theta_double_dot - G)
     
-    # this part is witchcraft to factor out a velocity
+    # this part is ai witchcraft to factor out a velocity
     C = zeros(n_joints, n_joints)
     for k in range(n_joints):       # like why are there 3 loops? (holy O(n^2))
         for j in range(n_joints):
